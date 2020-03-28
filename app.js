@@ -7,7 +7,7 @@ const livereload = require("livereload");
 const connectLivereload = require("connect-livereload");
 
 // open livereload high port and start to watch public directory for changes
-const liveReloadServer = livereload.createServer();
+const liveReloadServer = livereload.createServer({delay: 100});
 liveReloadServer.watch(path.join(__dirname, 'public'));
 
 // ping browser on Express boot, once browser has reconnected and handshaken

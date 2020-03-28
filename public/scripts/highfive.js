@@ -1,5 +1,5 @@
 
-import {myvalue, myvalue2} from './modtest.js';
+import {Hand} from './hand.js';
 
 window.onload = init;
 
@@ -8,8 +8,14 @@ var phallusPath;
 
 function init() {
     console.log('Hello world!');
-    console.log(myvalue);
-    console.log(myvalue2);
+    
+    let hand = new Hand();
+    let hand2 = new Hand();
+    hand2.curX = 1;
+
+    console.log(hand.curX);
+    console.log(hand2.curX);
+
     initPaths();
 
     draw();
