@@ -1,0 +1,11 @@
+{
+  "name": "hifiver",
+  "version": "1.0.0",
+  "description": "Hi five your friends today!",
+  "main": "highfive.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dim",
+  "license": "WTFPL"
+}
