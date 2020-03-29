@@ -146,8 +146,15 @@ function drawHand(ctx, hand, isPlayer){
 function checkHandIntersection(){
 
     let pHand = board.playerHand;
+
+    if(!pHand.isSlapping)
+        return false;
+    
     for(let otherPlayer of board.otherHands.keys()){
         let hand = board.otherHands.get(otherPlayer);
+        if(!hand.isSlapping){
+            continue;
+        }
 
         let dist = Math.sqrt(Math.pow(pHand.curX-hand.curX, 2) + Math.pow(pHand.curY-hand.curY, 2));
         console.log(`${pHand.id} dist from ${hand.id}: ${dist}`);
