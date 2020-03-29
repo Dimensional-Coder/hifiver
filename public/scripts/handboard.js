@@ -9,9 +9,9 @@ export class HandBoard{
     otherHands = null;
     playerHand = null;
 
-    constructor(){
+    constructor(playerName){
         this.otherHands = new Map();
-        this.playerHand = new Hand('Player');
+        this.playerHand = new Hand(playerName);
     }
 
     /**

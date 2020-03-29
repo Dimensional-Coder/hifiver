@@ -6,9 +6,10 @@ const CANVAS_REFRESH_INTERVAL = 30;
 const SLAP_SHRINK_SCALE = 0.75;
 const OTHER_HAND_SCALE = 0.6;
 const SLAP_GROW_SCALE = SLAP_SHRINK_SCALE / OTHER_HAND_SCALE;
+const HAND_SLAP_PROXIMITY = 50;
 
 var easterEggEnabled = false;
-var board = new HandBoard();
+var board = new HandBoard('PlayerName');
 var rhandImg, lhandImg;
 
 //Wait for resources to load.
@@ -65,9 +66,11 @@ function updatePlayerPos(e){
 function engageHighFive(e){
     board.playerHand.updateState(e.clientX, e.clientY, true);
 
-    slapSound.pause();
-    slapSound.currentTime = 0;
-    slapSound.play();
+    if(checkHandIntersection()){
+        slapSound.pause();
+        slapSound.currentTime = 0;
+        slapSound.play();
+    }
 }
 
 function retractHighFive(e){
@@ -96,6 +99,12 @@ function draw() {
 }
 
 function drawHands(ctx){
+    for(let otherPlayer of board.otherHands.keys()){
+        let hand = board.otherHands.get(otherPlayer);
+
+        drawHand(ctx, hand, false);
+    }
+
     let playerHand = board.playerHand;
 
     drawHand(ctx, playerHand, true);
@@ -128,6 +137,25 @@ function drawHand(ctx, hand, isPlayer){
     let x = relX - (dw/2+1), y = relY - (dh/2+1);
 
     ctx.drawImage(img, x, y, dw, dh);
+}
+
+/**
+ * See if hand is intersecting with any other hands.
+ * Used to determine if a SLAP sound is necessary.
+ */
+function checkHandIntersection(){
+
+    let pHand = board.playerHand;
+    for(let otherPlayer of board.otherHands.keys()){
+        let hand = board.otherHands.get(otherPlayer);
+
+        let dist = Math.sqrt(Math.pow(pHand.curX-hand.curX, 2) + Math.pow(pHand.curY-hand.curY, 2));
+        console.log(`${pHand.id} dist from ${hand.id}: ${dist}`);
+        if(dist < HAND_SLAP_PROXIMITY)
+            return true;
+    }
+
+    return false;
 }
 
 // Helper to get mouse pos in canvas space.
