@@ -2,26 +2,36 @@
 import {Hand} from './hand.js';
 import {HandBoard} from './handboard.js';
 
-var CANVAS_REFRESH_INTERVAL = 30;
-var SLAP_SHRINK_SCALE = 0.75;
+const CANVAS_REFRESH_INTERVAL = 30;
+const SLAP_SHRINK_SCALE = 0.75;
+const OTHER_HAND_SCALE = 0.6;
+const SLAP_GROW_SCALE = SLAP_SHRINK_SCALE / OTHER_HAND_SCALE;
+
 var easterEggEnabled = false;
 var board = new HandBoard();
-var handImg;
+var rhandImg, lhandImg;
 
 //Wait for resources to load.
-var pageLoaded = false, imgLoaded = false, soundLoaded = false;
+var pageLoaded = false, lhandLoaded = false, rhandLoaded=false, soundLoaded = false;
 
 window.onload = function(){
     pageLoaded = true;
     init();
 }
 
-handImg = new Image();
-handImg.addEventListener('load', function(){
-    imgLoaded = true;
+rhandImg = new Image();
+rhandImg.addEventListener('load', function(){
+    rhandLoaded = true;
     init();
 });
-handImg.src = 'img/right-hand-no-bg.png';
+rhandImg.src = 'img/right-hand-no-bg.png';
+
+lhandImg = new Image();
+lhandImg.addEventListener('load', function(){
+    lhandLoaded = true;
+    init();
+});
+lhandImg.src = 'img/left-hand-no-bg.png';
 
 var easterEggImg = new Image();
 easterEggImg.src = 'img/solid snake.jpg';
@@ -36,32 +46,32 @@ slapSound.addEventListener('canplaythrough', function(){
 //Does nothing if one or more resources are not
 //loaded yet.
 function init() {
-    if(!pageLoaded || !imgLoaded || !soundLoaded)
+    if(!pageLoaded || !lhandLoaded || !rhandLoaded || !soundLoaded)
         return;
 
-    document.addEventListener('mousemove', onMouseMove, false);
-    document.addEventListener('mousedown', onMouseDown, false);
-    document.addEventListener('mouseup', onMouseUp, false);
+    document.addEventListener('mousemove', updatePlayerPos, false);
+    document.addEventListener('mousedown', engageHighFive, false);
+    document.addEventListener('mouseup', retractHighFive, false);
     let canvas = document.getElementById('fiveplane');
     canvas.addEventListener('contextmenu', event => event.preventDefault());
 
     setInterval(draw, CANVAS_REFRESH_INTERVAL);
 }
 
-function onMouseMove(e){
-    board.updateState(e.clientX, e.clientY, board.playerHand.isSlapping);
+function updatePlayerPos(e){
+    board.playerHand.updateState(e.clientX, e.clientY, board.playerHand.isSlapping);
 }
 
-function onMouseDown(e){
-    board.updateState(e.clientX, e.clientY, true);
+function engageHighFive(e){
+    board.playerHand.updateState(e.clientX, e.clientY, true);
 
     slapSound.pause();
     slapSound.currentTime = 0;
     slapSound.play();
 }
 
-function onMouseUp(e){
-    board.updateState(e.clientX, e.clientY, false);
+function retractHighFive(e){
+    board.playerHand.updateState(e.clientX, e.clientY, false);
 }
 
 /**
@@ -77,32 +87,47 @@ function draw() {
 
     var ctx = canvas.getContext('2d');
 
-    //Draw a circle at current hand position
-    let playerHand = board.playerHand;
-    let {relX, relY} = getMousePos(canvas, playerHand.curX, playerHand.curY);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let w = handImg.width, h = handImg.height;
-
-    //position to draw image at
-    let x = relX - (w/2+1), y = relY - (h/2+1);
-
-    ctx.clearRect(x, y, w, h);
+    drawHands(ctx);
 
     if(easterEggEnabled)
         ctx.drawImage(easterEggImg, 100, 100, 500, 500);
-    
-    //Scale image down slightly if "slapping"
-    let dw = w, dh = h;
-    if(board.playerHand.isSlapping){
-        dw = w*SLAP_SHRINK_SCALE;
-        dh = h*SLAP_SHRINK_SCALE;
+}
 
-        x = relX - (dw/2+1);
-        y = relY - (dh/2+1);
+function drawHands(ctx){
+    let playerHand = board.playerHand;
+
+    drawHand(ctx, playerHand, true);
+}
+
+function drawHand(ctx, hand, isPlayer){
+    let {relX, relY} = getMousePos(ctx.canvas, hand.curX, hand.curY);
+    let img = rhandImg;
+
+    let w = img.width, h = img.height;
+
+    //Image scale, used for slapping and other hands
+    let dw = w, dh = h;
+    let slapScale = SLAP_SHRINK_SCALE;
+
+    if(!isPlayer){
+        img = lhandImg;
+        slapScale = SLAP_GROW_SCALE;
+        dw = w*OTHER_HAND_SCALE;
+        dh = h*OTHER_HAND_SCALE;
+    }
+    
+    //Scale image if "slapping"
+    if(hand.isSlapping){
+        dw = dw*slapScale;
+        dh = dh*slapScale;
     }
 
-    ctx.drawImage(handImg, x, y, dw, dh);
+    //position to draw image at
+    let x = relX - (dw/2+1), y = relY - (dh/2+1);
 
+    ctx.drawImage(img, x, y, dw, dh);
 }
 
 // Helper to get mouse pos in canvas space.

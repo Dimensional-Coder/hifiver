@@ -6,21 +6,26 @@ import { Hand } from "./hand.js";
  */
 export class HandBoard{
 
-    otherHands = [];
+    otherHands = null;
     playerHand = null;
 
     constructor(){
-        this.otherHands = [];
-        this.playerHand = new Hand();
+        this.otherHands = new Map();
+        this.playerHand = new Hand('Player');
     }
 
+    /**
+     * Add a new hand to the board. Expects it to have
+     * an id. Will not add a duplicate hand.
+     * 
+     * @returns True if added, false if not added
+     */
     addHand(hand){
-        this.otherHands.push(hand);
-    }
+        if(this.otherHands.has(hand.id)){
+            return false;
+        }
 
-    updateState(x, y, slapping){
-        this.playerHand.updateState(x, y, slapping);
-
-        //ignore other hands for now
+        this.otherHands.set(hand.id, hand);
+        return true;
     }
 }

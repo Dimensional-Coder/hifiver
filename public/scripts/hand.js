@@ -4,14 +4,13 @@
  */
 export class Hand{
 
-    id = 1;
-    isFlipped = false;
-    curX = 5;
+    id = null;
+    curX = 0;
     curY = 0;
     isSlapping = false;
 
-    constructor(isFlipped = false){
-        this.isFlipped = isFlipped;
+    constructor(name){
+        this.id = name;
     }
 
     updateState(x, y, slapping){
