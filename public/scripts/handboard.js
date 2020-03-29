@@ -18,8 +18,8 @@ export class HandBoard{
         this.otherHands.push(hand);
     }
 
-    updateState(x, y){
-        this.playerHand.updateState(x, y);
+    updateState(x, y, slapping){
+        this.playerHand.updateState(x, y, slapping);
 
         //ignore other hands for now
     }

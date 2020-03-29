@@ -3,17 +3,34 @@ import {Hand} from './hand.js';
 import {HandBoard} from './handboard.js';
 
 var CANVAS_REFRESH_INTERVAL = 30;
+var SLAP_SHRINK_SCALE = 0.75;
 var board = new HandBoard();
+var handImg;
 
-window.onload = init;
+handImg = new Image();
+handImg.addEventListener('load', init);
+handImg.src = 'img/right-hand-no-bg.png';
 
 function init() {
-    document.addEventListener('mousemove', onMouseUpdate, false);
+    document.addEventListener('mousemove', onMouseMove, false);
+    document.addEventListener('mousedown', onMouseDown, false);
+    document.addEventListener('mouseup', onMouseUp, false);
+    let canvas = document.getElementById('fiveplane');
+    canvas.addEventListener('contextmenu', event => event.preventDefault());
+
     setInterval(draw, CANVAS_REFRESH_INTERVAL);
 }
 
-function onMouseUpdate(e){
-    board.updateState(e.clientX, e.clientY);
+function onMouseMove(e){
+    board.updateState(e.clientX, e.clientY, board.playerHand.isSlapping);
+}
+
+function onMouseDown(e){
+    board.updateState(e.clientX, e.clientY, true);
+}
+
+function onMouseUp(e){
+    board.updateState(e.clientX, e.clientY, false);
 }
 
 /**
@@ -33,11 +50,24 @@ function draw() {
     let playerHand = board.playerHand;
     let {relX, relY} = getMousePos(canvas, playerHand.curX, playerHand.curY);
 
-    ctx.clearRect(relX-30, relX-30, 60, 60);
-    ctx.fillStyle = 'rgb(200, 0, 0)';
-    ctx.beginPath();
-    ctx.arc(relX, relY, 50, 0, Math.PI * 2);
-    ctx.fill();
+    let w = handImg.width, h = handImg.height;
+
+    //position to draw image at
+    let x = relX - (w/2+1), y = relY - (h/2+1);
+
+    ctx.clearRect(x, y, w, h);
+
+    //Scale image down slightly if "slapping"
+    let dw = w, dh = h;
+    if(board.playerHand.isSlapping){
+        dw = w*SLAP_SHRINK_SCALE;
+        dh = h*SLAP_SHRINK_SCALE;
+
+        x = relX - (dw/2+1);
+        y = relY - (dh/2+1);
+    }
+
+    ctx.drawImage(handImg, x, y, dw, dh);
 
 }
 
