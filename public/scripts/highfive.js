@@ -7,11 +7,34 @@ var SLAP_SHRINK_SCALE = 0.75;
 var board = new HandBoard();
 var handImg;
 
+//Wait for resources to load.
+var pageLoaded = false, imgLoaded = false, soundLoaded = false;
+
+window.onload = function(){
+    pageLoaded = true;
+    init();
+}
+
 handImg = new Image();
-handImg.addEventListener('load', init);
+handImg.addEventListener('load', function(){
+    imgLoaded = true;
+    init();
+});
 handImg.src = 'img/right-hand-no-bg.png';
 
+let slapSound = new Audio('sfx/Slap-SoundMaster13-Trimmed.wav');
+slapSound.addEventListener('canplaythrough', function(){
+    soundLoaded = true;
+    init();
+})
+
+//Initialize canvas and start render loop.
+//Does nothing if one or more resources are not
+//loaded yet.
 function init() {
+    if(!pageLoaded || !imgLoaded || !soundLoaded)
+        return;
+
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('mousedown', onMouseDown, false);
     document.addEventListener('mouseup', onMouseUp, false);
@@ -27,6 +50,10 @@ function onMouseMove(e){
 
 function onMouseDown(e){
     board.updateState(e.clientX, e.clientY, true);
+
+    slapSound.pause();
+    slapSound.currentTime = 0;
+    slapSound.play();
 }
 
 function onMouseUp(e){

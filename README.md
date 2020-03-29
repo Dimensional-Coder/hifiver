@@ -20,3 +20,7 @@ Sometimes you need a good high five to lift your spirits. And now you can do jus
 
 Remember, the only thing more contagious than a disease is good vibes. 
 Start high fiving today! You can get slapping at example.com/projectisnotcomplete
+
+## Attribution
+Hand picture belongs to Clipart Library http://clipart-library.com/clipart/kTMRXoGzc.htm
+High five sound belongs to SoundMaster13 http://soundbible.com/1948-Slap.html
