@@ -4,6 +4,7 @@ import {HandBoard} from './handboard.js';
 
 var CANVAS_REFRESH_INTERVAL = 30;
 var SLAP_SHRINK_SCALE = 0.75;
+var easterEggEnabled = false;
 var board = new HandBoard();
 var handImg;
 
@@ -21,6 +22,9 @@ handImg.addEventListener('load', function(){
     init();
 });
 handImg.src = 'img/right-hand-no-bg.png';
+
+var easterEggImg = new Image();
+easterEggImg.src = 'img/solid snake.jpg';
 
 let slapSound = new Audio('sfx/Slap-SoundMaster13-Trimmed.wav');
 slapSound.addEventListener('canplaythrough', function(){
@@ -84,6 +88,9 @@ function draw() {
 
     ctx.clearRect(x, y, w, h);
 
+    if(easterEggEnabled)
+        ctx.drawImage(easterEggImg, 100, 100, 500, 500);
+    
     //Scale image down slightly if "slapping"
     let dw = w, dh = h;
     if(board.playerHand.isSlapping){
